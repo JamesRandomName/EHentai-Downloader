@@ -7,9 +7,9 @@ using System.Text.RegularExpressions;
 using System.IO;
 using System.Net;
 
-namespace ehDownloader
+namespace EHDownloader_UI
 {
-    
+
 
     public class Downloader
     {
@@ -80,12 +80,12 @@ namespace ehDownloader
                 string imageurl = PictureRegex.Match(webpage).Value;
                 nextpage = NextRegex.Match(webpage).Value;
                 ThreadPool.QueueUserWorkItem(new WaitCallback(ThreadDownload), new ImageInfo(track, imageurl));
-                Thread.Sleep(100);
+                Thread.Sleep(250);
                 track++;
             } while (currentpage != nextpage);
             do
             {
-                Thread.Sleep(100);
+                Thread.Sleep(1000);
             } while (GetRunning() != 0);
         }
 
@@ -103,7 +103,7 @@ namespace ehDownloader
 
         void DisplayPage(int PageNumber)
         {
-            lock(_DisplayLock)
+            lock (_DisplayLock)
             {
                 Console.WriteLine(PageNumber);
             }
@@ -111,7 +111,7 @@ namespace ehDownloader
 
         void AddThread()
         {
-            lock(_CountLock)
+            lock (_CountLock)
             {
                 ThreadCount++;
             }
@@ -119,7 +119,7 @@ namespace ehDownloader
 
         void EndThread()
         {
-            lock(_CountLock)
+            lock (_CountLock)
             {
                 ThreadCount--;
             }
@@ -128,7 +128,7 @@ namespace ehDownloader
         int GetRunning()
         {
             int RunningThreads;
-            lock(_CountLock)
+            lock (_CountLock)
             {
                 RunningThreads = ThreadCount;
             }
