@@ -38,6 +38,7 @@ namespace EHDownloader_UI
             this.label2 = new System.Windows.Forms.Label();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.button4 = new System.Windows.Forms.Button();
+            this.listBox2 = new System.Windows.Forms.ListBox();
             this.SuspendLayout();
             // 
             // button1
@@ -99,7 +100,7 @@ namespace EHDownloader_UI
             this.listBox1.ItemHeight = 16;
             this.listBox1.Location = new System.Drawing.Point(180, 183);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(864, 404);
+            this.listBox1.Size = new System.Drawing.Size(675, 404);
             this.listBox1.TabIndex = 6;
             this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
             // 
@@ -113,11 +114,22 @@ namespace EHDownloader_UI
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
+            // listBox2
+            // 
+            this.listBox2.FormattingEnabled = true;
+            this.listBox2.ItemHeight = 16;
+            this.listBox2.Location = new System.Drawing.Point(861, 183);
+            this.listBox2.Name = "listBox2";
+            this.listBox2.Size = new System.Drawing.Size(235, 404);
+            this.listBox2.TabIndex = 8;
+            this.listBox2.SelectedIndexChanged += new System.EventHandler(this.listBox2_SelectedIndexChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1108, 591);
+            this.Controls.Add(this.listBox2);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.listBox1);
             this.Controls.Add(this.label2);
@@ -143,6 +155,7 @@ namespace EHDownloader_UI
         private Label label2;
         private ListBox listBox1;
         private Button button4;
+        private ListBox listBox2;
     }
 }
 

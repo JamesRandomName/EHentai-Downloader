@@ -18,7 +18,9 @@ namespace EHDownloader_UI
         List<MangaClass> MangaList = new List<MangaClass>();
         Regex TagRegex = new Regex("(?<= )[^\\n,]+");
         HashSet<string> ToShow = new HashSet<string>();
+        HashSet<string> FilteredItems = new HashSet<string>();
         bool FinishedFiltering = false;
+        string Type;
 
         public Form1()
         {
@@ -34,10 +36,24 @@ namespace EHDownloader_UI
         {
             if (textBox1.Text.Length != 0)
             {
-                label1.Text = "Downloading";
-                label1.Refresh();
-                (new Downloader(textBox1.Text)).StartDownload();
-                label1.Text = "Done";
+                if (textBox1.Text.Contains("https://e-hentai.org/"))
+                {
+                    label1.Text = "Downloading";
+                    label1.Refresh();
+                    Downloader MyDownloader = new Downloader(textBox1.Text);
+                    bool worked = MyDownloader.StartDownload();
+                    if (worked)
+                    {
+                        label1.Text = "Done";
+                    }else
+                    {
+                        MessageBox.Show("Error while downloading. Please try again.");
+                    }
+                }else
+                {
+                    label1.Text = "Invalid Entry";
+                    label1.Refresh();
+                }
             }
         }
 
@@ -71,14 +87,27 @@ namespace EHDownloader_UI
             }
             else
             {
+                bool Worked = true;
                 label2.Text = "Downloading";
                 label2.Refresh();
                 foreach (string inputline in File.ReadAllLines("input.txt"))
                 {
                     if (inputline.Length != 0)
-                        (new Downloader(inputline)).StartDownload();
+                    {
+                        Downloader myDownloader = new Downloader(inputline);
+                        if(myDownloader.StartDownload() == false)
+                        {
+                            Worked = false;
+                        }
+                    }
                 }
-                label2.Text = "Done";
+                if (Worked)
+                {
+                    label2.Text = "Done";
+                }else
+                {
+                    MessageBox.Show("Error while downloading. Please try again.");
+                }
             }
         }
 
@@ -152,7 +181,8 @@ namespace EHDownloader_UI
                 
                 foreach (string ThisTag in ThisGroup.Tags)
                 {
-                    ToShow.Add(ThisGroup.GroupName + ":" + ThisTag);
+                    string ItemToAdd = ThisGroup.GroupName + ":" + ThisTag;
+                     ToShow.Add(ItemToAdd);
                 }
             }
 
@@ -165,12 +195,21 @@ namespace EHDownloader_UI
             {
                 if (listBox1.SelectedItem != null)
                 {
-                    SortManga(listBox1.SelectedItem.ToString());
+                    string SelectedItem = listBox1.SelectedItem.ToString();
+                    FilteredItems.Add(SelectedItem);
+                    listBox2.BeginUpdate();
+                    listBox2.Items.Add(SelectedItem);
+                    listBox2.EndUpdate();
+                    SortManga(SelectedItem);
+                    ToShow.Remove(SelectedItem);
                     listBox1.BeginUpdate();
                     listBox1.Items.Clear();
                     foreach (string x in ToShow)
                     {
-                        listBox1.Items.Add(x);
+                        if (!FilteredItems.Contains(x))
+                        {
+                            listBox1.Items.Add(x);
+                        }
                     }
                     listBox1.EndUpdate();
                 }
@@ -196,6 +235,11 @@ namespace EHDownloader_UI
                 listBox1.Items.Add(y);
             }
             listBox1.EndUpdate();
+        }
+
+        private void listBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

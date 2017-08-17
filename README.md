@@ -10,3 +10,6 @@ To use the batch downloader paste a list of urls onto input.txt
 
 ----------------------------------------
 For filtering with the UI first click Filter. You will need to select an item from the list for the filtering to work. You can continue filtering just by selecting items from the list.
+
+----------------------------------------
+Sometimes there are issues while downloading the images. A message box will tell you to retry if it happens. Retrying takes much less time as it only downloads the missing pictures.

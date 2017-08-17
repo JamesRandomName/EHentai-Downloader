@@ -21,26 +21,28 @@ namespace EHDownloader_UI
         Regex PictureRegex = new Regex("(?<=id=\"img\" src=\")[^\"]+");
         Regex NextRegex = new Regex("[^\"]+(?=\"><img src=\"https:\\/\\/ehgt\\.org\\/g\\/n.png\")");
         Regex FixRegex = new Regex("[\\/:*?\"<>|]");
+        Regex TypeRegex = new Regex("([^\"]+)(?=\"><img src=\"https:\\/\\/ehgt.org\\/g\\/c\\/\\1.png\")");
         WebClient myClient = new WebClient();
         string PageUrl;
         string Name;
         readonly object _CountLock = new object();
         readonly object _DisplayLock = new object();
         int ThreadCount = 0;
+        bool Worked = true;
 
         public Downloader(string PageURL)
         {
             this.PageUrl = PageURL;
         }
 
-        public void StartDownload()
+        public bool StartDownload()
         {
             string BasePage;
             BasePage = myClient.DownloadString(PageUrl);
             List<string> GroupNames = new List<string>();
             List<Group> Groups = new List<Group>();
             Name = FixRegex.Replace(NameRegex.Match(BasePage).Value, " ");
-            Console.WriteLine(Name);
+            string Type = TypeRegex.Match(BasePage).Value;
             for (int x = 0; x < TagRegex.Matches(BasePage).Count; x++)
             {
                 string GroupName = GroupRegex.Matches(BasePage)[x].Value;
@@ -52,7 +54,7 @@ namespace EHDownloader_UI
                 }
                 Groups[GroupNames.IndexOf(GroupName)].Tags.Add(TagName);
             }
-            string infoString = "";
+            string infoString = "Type: " + Type + "\n";
             foreach (Group theGroup in Groups)
             {
                 infoString = infoString + theGroup.GroupName + ": ";
@@ -66,6 +68,7 @@ namespace EHDownloader_UI
             Directory.CreateDirectory(Name);
             File.WriteAllText(Name + "\\" + "info.txt", infoString);
             DownloadImage(BasePage);
+            return Worked;
         }
 
         void DownloadImage(string BasePage)
@@ -80,7 +83,6 @@ namespace EHDownloader_UI
                 string imageurl = PictureRegex.Match(webpage).Value;
                 nextpage = NextRegex.Match(webpage).Value;
                 ThreadPool.QueueUserWorkItem(new WaitCallback(ThreadDownload), new ImageInfo(track, imageurl));
-                Thread.Sleep(250);
                 track++;
             } while (currentpage != nextpage);
             do
@@ -95,9 +97,18 @@ namespace EHDownloader_UI
             int PageNumber = TheInfo.PageNumber;
             string ImageUrl = TheInfo.PageUrl;
             AddThread();
-            DisplayPage(PageNumber);
-            WebClient PageClient = new WebClient();
-            PageClient.DownloadFile(ImageUrl, Name + "\\" + PageNumber.ToString() + ".jpg");
+            //DisplayPage(PageNumber); Not used for UI
+            if(!File.Exists(Name + "\\" + PageNumber.ToString() + ".jpg"))
+            {
+                try
+                {
+                    WebClient PageClient = new WebClient();
+                    PageClient.DownloadFile(ImageUrl, Name + "\\" + PageNumber.ToString() + ".jpg");
+                }catch(WebException e)
+                {
+                    Worked = false;
+                }
+            }
             EndThread();
         }
 
