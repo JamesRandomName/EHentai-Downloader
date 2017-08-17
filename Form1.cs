@@ -87,26 +87,33 @@ namespace EHDownloader_UI
             }
             else
             {
-                bool Worked = true;
-                label2.Text = "Downloading";
-                label2.Refresh();
-                foreach (string inputline in File.ReadAllLines("input.txt"))
+                try
                 {
-                    if (inputline.Length != 0)
+                    bool Worked = true;
+                    label2.Text = "Downloading";
+                    label2.Refresh();
+                    foreach (string inputline in File.ReadAllLines("input.txt"))
                     {
-                        Downloader myDownloader = new Downloader(inputline);
-                        if(myDownloader.StartDownload() == false)
+                        if (inputline.Length != 0)
                         {
-                            Worked = false;
+                            Downloader myDownloader = new Downloader(inputline);
+                            if (myDownloader.StartDownload() == false)
+                            {
+                                Worked = false;
+                            }
                         }
                     }
-                }
-                if (Worked)
+                    if (Worked)
+                    {
+                        label2.Text = "Done";
+                    }
+                    else
+                    {
+                        MessageBox.Show("Error while downloading. Please try again.");
+                    }
+                }catch(IOException theexception)
                 {
-                    label2.Text = "Done";
-                }else
-                {
-                    MessageBox.Show("Error while downloading. Please try again.");
+
                 }
             }
         }
@@ -142,19 +149,23 @@ namespace EHDownloader_UI
             MangaClass AllTags = new MangaClass("AllTags");
             foreach (string manga in MangaInput)
             {
-                MangaClass ThisManga = new MangaClass(manga);
-                foreach (string InfoLine in File.ReadAllLines(manga + "\\" + "info.txt"))
+                if (File.Exists(manga + "\\info.txt"))
                 {
-                    string GroupName = InfoLine.Substring(0, InfoLine.IndexOf(':'));
-                    Group ThisGroup = new Group(GroupName);
-                    foreach (Match TagMatch in TagRegex.Matches(InfoLine))
+                    MangaClass ThisManga = new MangaClass(manga);
+
+                    foreach (string InfoLine in File.ReadAllLines(manga + "\\info.txt"))
                     {
-                        ThisGroup.Tags.Add(TagMatch.Value);
+                        string GroupName = InfoLine.Substring(0, InfoLine.IndexOf(':'));
+                        Group ThisGroup = new Group(GroupName);
+                        foreach (Match TagMatch in TagRegex.Matches(InfoLine))
+                        {
+                            ThisGroup.Tags.Add(TagMatch.Value);
+                        }
+                        ThisManga.GroupNames.Add(GroupName);
+                        ThisManga.Groups.Add(ThisGroup);
                     }
-                    ThisManga.GroupNames.Add(GroupName);
-                    ThisManga.Groups.Add(ThisGroup);
+                    MangaList.Add(ThisManga);
                 }
-                MangaList.Add(ThisManga);
             }
             foreach (MangaClass ThisManga in MangaList)
             {
