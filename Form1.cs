@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace EHDownloader_UI
 {
@@ -224,6 +225,10 @@ namespace EHDownloader_UI
                     }
                     listBox1.EndUpdate();
                 }
+            }else
+            {
+                string SelectedManga = listBox1.SelectedItem.ToString();
+                Process.Start(Directory.GetCurrentDirectory() + "\\" + SelectedManga);
             }
         }
 
